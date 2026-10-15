@@ -31,6 +31,8 @@ export interface Deps {
   /** True when the address signed `message` and is an active verifier on chain. */
   verifierSigned: (address: `0x${string}`, message: string, signature: `0x${string}`) => Promise<boolean>;
   installationId: (country: string, registryId: string) => string;
+  /** The on-chain role an address already holds, if any: one key, one job. */
+  roleOf: (address: `0x${string}`) => Promise<"verifier" | "accreditor" | null>;
   chain: ChainReader;
   /** Contract addresses and ids the web app needs; served as-is. */
   config: Record<string, unknown>;
@@ -101,6 +103,8 @@ export function createApp(deps: Deps) {
     for (const k of ["name", "country", "registryId", "operator", "route"]) if (!b[k]) fail(400, `${k} is required`);
     if (!/^0x[0-9a-fA-F]{40}$/.test(b.operator)) fail(400, "operator must be a 0x address");
     if (!ROUTES.has(b.route)) fail(400, `route must be one of ${[...ROUTES].join(", ")}`);
+    const role = await deps.roleOf(b.operator);
+    if (role) fail(409, `${b.operator} is the ${role}; an operator key can't hold another role`);
     const id = deps.installationId(b.country, b.registryId);
     db.query(
       "INSERT INTO installations (id, name, country, registry_id, operator, route) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO NOTHING",

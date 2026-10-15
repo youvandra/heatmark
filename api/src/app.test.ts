@@ -8,6 +8,7 @@ import { openDb } from "./db";
 import type { ExtractResult } from "../../extract/src/extract";
 
 const OPERATOR = "0x189De84f3832fB8FC1AF30712BDEF8F467f94210";
+const VERIFIER = "0xd2321c9236733B39D8994DDEbd2175896B8412dF";
 const GAS_CSV = "Fatura,Dönem\nDoğal gaz tüketimi,1.500.000 kWh\n";
 
 let app: ReturnType<typeof createApp>;
@@ -69,6 +70,7 @@ beforeEach(() => {
     attestedEvent: async () => nextEvent as AttestedEvent,
     verifierSigned: async () => signerOk,
     installationId: (country, id) => keccak256(toBytes(`${country.toUpperCase()}/${id}`)),
+    roleOf: async (a) => (a.toLowerCase() === VERIFIER.toLowerCase() ? "verifier" : null),
     chain: fakeChain,
     config: { chainId: 296 },
   });
@@ -173,6 +175,12 @@ describe("report lifecycle", () => {
     expect((await json("POST", `/reports/${rep.id}/reject`, body)).status).toBe(403);
     signerOk = true;
     expect((await (await json("POST", `/reports/${rep.id}/reject`, body)).json()).status).toBe("draft");
+  });
+
+  test("a verifier key can't also register as an operator", async () => {
+    const res = await json("POST", "/installations", { name: "x", country: "TR", registryId: "V-1", operator: VERIFIER, route: "E" });
+    expect(res.status).toBe(409);
+    expect((await res.json()).error).toContain("verifier");
   });
 
   test("input validation", async () => {
