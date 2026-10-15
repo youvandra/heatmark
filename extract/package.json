@@ -1,0 +1,12 @@
+{
+  "name": "@heatmark/extract",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.134.0",
+    "unpdf": "^1.8.1",
+    "zod": "^4.6.7"
+  }
+}

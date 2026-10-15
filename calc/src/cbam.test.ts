@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { benchmarkFor, compare, composeSee, defaultFor, toMicro, tonnes } from "./index";
+import { attributedEmissions, benchmarkFor, compare, composeSee, defaultFor, toMicro, tonnes } from "./index";
 
 describe("tables", () => {
   test("Türkiye rebar default is the BF/BOF row", () => {
@@ -61,5 +61,23 @@ describe("composeSee", () => {
 
   test("no precursors leaves own intensity", () => {
     expect(composeSee(123n, 1000n, [])).toBe(123n);
+  });
+});
+
+describe("attributedEmissions", () => {
+  test("sums source streams and divides by production", () => {
+    const r = attributedEmissions({ productionT: 1000, naturalGasGJ: 2000, electrodeT: 2, limestoneT: 30 });
+    expect(r.lines.map((l) => l.stream)).toEqual(["natural gas", "electrodes", "limestone"]);
+    const expected = 2000 * 0.0561 + 2 * 0.82 * (44 / 12) + 30 * 0.43971;
+    expect(r.totalT).toBeCloseTo(expected, 9);
+    expect(r.ownIntensity).toBeCloseTo(expected / 1000, 12);
+  });
+
+  test("electricity is reported, never counted", () => {
+    expect(attributedEmissions({ productionT: 10, electricityMWh: 5000 }).totalT).toBe(0);
+  });
+
+  test("zero production is refused", () => {
+    expect(() => attributedEmissions({ productionT: 0 })).toThrow();
   });
 });
