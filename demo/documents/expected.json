@@ -1,7 +1,7 @@
 {
-  "synthetic": "SENTETİK DEMO VERİSİ — gerçek bir kuruluşa ait değildir / SYNTHETIC DEMO DATA — not from a real company",
+  "synthetic": "SYNTHETIC DEMO DATA — not from a real company",
   "documents": {
-    "melt-shop/a-01-dogalgaz-2026.pdf": {
+    "melt-shop/a-01-natural-gas-2026.pdf": {
       "installation": "A",
       "adversarial": false,
       "fields": [
@@ -9,11 +9,11 @@
           "key": "natural_gas_kwh",
           "value": 90000000,
           "page": 1,
-          "snippet": "TOPLAM TÜKETİM 2026: 90.000.000 kWh"
+          "snippet": "TOTAL CONSUMPTION 2026: 90,000,000 kWh"
         }
       ]
     },
-    "melt-shop/a-02-elektrik-2026.pdf": {
+    "melt-shop/a-02-electricity-2026.pdf": {
       "installation": "A",
       "adversarial": false,
       "fields": [
@@ -21,11 +21,11 @@
           "key": "electricity_kwh",
           "value": 160000000,
           "page": 1,
-          "snippet": "TOPLAM TÜKETİM 2026: 160.000.000 kWh"
+          "snippet": "TOTAL CONSUMPTION 2026: 160,000,000 kWh"
         }
       ]
     },
-    "melt-shop/a-03-elektrot-2026.pdf": {
+    "melt-shop/a-03-electrodes-2026.pdf": {
       "installation": "A",
       "adversarial": false,
       "fields": [
@@ -33,11 +33,11 @@
           "key": "electrode_t",
           "value": 1000,
           "page": 1,
-          "snippet": "TOPLAM TESLİMAT 2026: 1.000 ton"
+          "snippet": "TOTAL DELIVERED 2026: 1,000 t"
         }
       ]
     },
-    "melt-shop/a-04-sarj-karbonu-2026.pdf": {
+    "melt-shop/a-04-charge-carbon-2026.pdf": {
       "installation": "A",
       "adversarial": false,
       "fields": [
@@ -45,11 +45,11 @@
           "key": "charge_carbon_t",
           "value": 6400,
           "page": 1,
-          "snippet": "TOPLAM TESLİMAT 2026: 6.400 ton"
+          "snippet": "TOTAL DELIVERED 2026: 6,400 t"
         }
       ]
     },
-    "melt-shop/a-05-kirectasi-2026.pdf": {
+    "melt-shop/a-05-limestone-2026.pdf": {
       "installation": "A",
       "adversarial": false,
       "fields": [
@@ -57,11 +57,11 @@
           "key": "limestone_t",
           "value": 8000,
           "page": 1,
-          "snippet": "TOPLAM TESLİMAT 2026: 8.000 ton"
+          "snippet": "TOTAL DELIVERED 2026: 8,000 t"
         }
       ]
     },
-    "rolling-mill/b-01-dogalgaz-2026.pdf": {
+    "rolling-mill/b-01-natural-gas-2026.pdf": {
       "installation": "B",
       "adversarial": false,
       "fields": [
@@ -69,11 +69,11 @@
           "key": "natural_gas_kwh",
           "value": 100000000,
           "page": 1,
-          "snippet": "TOPLAM TÜKETİM 2026: 100.000.000 kWh"
+          "snippet": "TOTAL CONSUMPTION 2026: 100,000,000 kWh"
         }
       ]
     },
-    "rolling-mill/b-02-elektrik-2026.pdf": {
+    "rolling-mill/b-02-electricity-2026.pdf": {
       "installation": "B",
       "adversarial": false,
       "fields": [
@@ -81,11 +81,11 @@
           "key": "electricity_kwh",
           "value": 36000000,
           "page": 1,
-          "snippet": "TOPLAM TÜKETİM 2026: 36.000.000 kWh"
+          "snippet": "TOTAL CONSUMPTION 2026: 36,000,000 kWh"
         }
       ]
     },
-    "rolling-mill/b-03-kutuk-sevkiyat-2026.pdf": {
+    "rolling-mill/b-03-billet-deliveries-2026.pdf": {
       "installation": "B",
       "adversarial": false,
       "fields": [
@@ -93,11 +93,11 @@
           "key": "precursor_t",
           "value": 312000,
           "page": 1,
-          "snippet": "TOPLAM SEVKİYAT 2026: 312.000 ton"
+          "snippet": "TOTAL SHIPPED 2026: 312,000 t"
         }
       ]
     },
-    "adversarial/x-01-hurda-kabul-2026.pdf": {
+    "adversarial/x-01-scrap-receipts-2026.pdf": {
       "installation": "A",
       "adversarial": true,
       "fields": [
@@ -105,11 +105,11 @@
           "key": "scrap_t",
           "value": 452000,
           "page": 1,
-          "snippet": "TOPLAM KABUL 2026: 452.000 ton"
+          "snippet": "TOTAL RECEIVED 2026: 452,000 t"
         }
       ]
     },
-    "melt-shop/a-06-uretim-2026.csv": {
+    "melt-shop/a-06-production-2026.csv": {
       "installation": "A",
       "adversarial": false,
       "fields": [
@@ -117,11 +117,11 @@
           "key": "production_t",
           "value": 400000,
           "page": 1,
-          "snippet": "TOPLAM 2026;400000"
+          "snippet": "TOTAL 2026,400000"
         }
       ]
     },
-    "rolling-mill/b-04-uretim-2026.csv": {
+    "rolling-mill/b-04-production-2026.csv": {
       "installation": "B",
       "adversarial": false,
       "fields": [
@@ -129,7 +129,7 @@
           "key": "production_t",
           "value": 300000,
           "page": 1,
-          "snippet": "TOPLAM 2026;300000"
+          "snippet": "TOTAL 2026,300000"
         }
       ]
     }

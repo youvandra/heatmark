@@ -16,7 +16,7 @@ const modelId = localId ?? MODEL;
 
 const DIR = resolve(dirname(new URL(import.meta.url).pathname), "documents");
 const expected = JSON.parse(readFileSync(resolve(DIR, "expected.json"), "utf8"));
-const NAMES: Record<string, string> = { A: "Örnek Çelikhane A.Ş. (synthetic)", B: "Örnek Haddehane A.Ş. (synthetic)" };
+const NAMES: Record<string, string> = { A: "Aegean Melt Shop Ltd. (synthetic)", B: "Aegean Rolling Mill Ltd. (synthetic)" };
 // Claude Opus 5.5 list price, $ per token; only meaningful for the SDK path.
 const PRICE = { input: 4 / 1e6, output: 20 / 1e6 };
 
