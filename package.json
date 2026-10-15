@@ -4,12 +4,14 @@
   "workspaces": [
     "calc",
     "extract",
-    "api"
+    "api",
+    "demo"
   ],
   "scripts": {
     "verify": "bun run calc/scripts/verify.ts",
     "test": "bun test && cd contracts && forge test",
-    "deploy": "cd contracts && forge build && cd .. && bun run contracts/script/deploy.ts"
+    "deploy": "cd contracts && forge build && cd .. && bun run contracts/script/deploy.ts",
+    "demo:docs": "bun run demo/generate.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.4.3",

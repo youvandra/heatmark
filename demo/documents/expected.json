@@ -1,0 +1,188 @@
+{
+  "synthetic": "SENTETİK DEMO VERİSİ — gerçek bir kuruluşa ait değildir / SYNTHETIC DEMO DATA — not from a real company",
+  "documents": {
+    "melt-shop/a-01-dogalgaz-2026.pdf": {
+      "installation": "A",
+      "adversarial": false,
+      "fields": [
+        {
+          "key": "natural_gas_kwh",
+          "value": 90000000,
+          "page": 1,
+          "snippet": "TOPLAM TÜKETİM 2026: 90.000.000 kWh"
+        }
+      ]
+    },
+    "melt-shop/a-02-elektrik-2026.pdf": {
+      "installation": "A",
+      "adversarial": false,
+      "fields": [
+        {
+          "key": "electricity_kwh",
+          "value": 160000000,
+          "page": 1,
+          "snippet": "TOPLAM TÜKETİM 2026: 160.000.000 kWh"
+        }
+      ]
+    },
+    "melt-shop/a-03-elektrot-2026.pdf": {
+      "installation": "A",
+      "adversarial": false,
+      "fields": [
+        {
+          "key": "electrode_t",
+          "value": 1000,
+          "page": 1,
+          "snippet": "TOPLAM TESLİMAT 2026: 1.000 ton"
+        }
+      ]
+    },
+    "melt-shop/a-04-sarj-karbonu-2026.pdf": {
+      "installation": "A",
+      "adversarial": false,
+      "fields": [
+        {
+          "key": "charge_carbon_t",
+          "value": 6400,
+          "page": 1,
+          "snippet": "TOPLAM TESLİMAT 2026: 6.400 ton"
+        }
+      ]
+    },
+    "melt-shop/a-05-kirectasi-2026.pdf": {
+      "installation": "A",
+      "adversarial": false,
+      "fields": [
+        {
+          "key": "limestone_t",
+          "value": 8000,
+          "page": 1,
+          "snippet": "TOPLAM TESLİMAT 2026: 8.000 ton"
+        }
+      ]
+    },
+    "rolling-mill/b-01-dogalgaz-2026.pdf": {
+      "installation": "B",
+      "adversarial": false,
+      "fields": [
+        {
+          "key": "natural_gas_kwh",
+          "value": 100000000,
+          "page": 1,
+          "snippet": "TOPLAM TÜKETİM 2026: 100.000.000 kWh"
+        }
+      ]
+    },
+    "rolling-mill/b-02-elektrik-2026.pdf": {
+      "installation": "B",
+      "adversarial": false,
+      "fields": [
+        {
+          "key": "electricity_kwh",
+          "value": 36000000,
+          "page": 1,
+          "snippet": "TOPLAM TÜKETİM 2026: 36.000.000 kWh"
+        }
+      ]
+    },
+    "rolling-mill/b-03-kutuk-sevkiyat-2026.pdf": {
+      "installation": "B",
+      "adversarial": false,
+      "fields": [
+        {
+          "key": "precursor_t",
+          "value": 312000,
+          "page": 1,
+          "snippet": "TOPLAM SEVKİYAT 2026: 312.000 ton"
+        }
+      ]
+    },
+    "adversarial/x-01-hurda-kabul-2026.pdf": {
+      "installation": "A",
+      "adversarial": true,
+      "fields": [
+        {
+          "key": "scrap_t",
+          "value": 452000,
+          "page": 1,
+          "snippet": "TOPLAM KABUL 2026: 452.000 ton"
+        }
+      ]
+    },
+    "melt-shop/a-06-uretim-2026.csv": {
+      "installation": "A",
+      "adversarial": false,
+      "fields": [
+        {
+          "key": "production_t",
+          "value": 400000,
+          "page": 1,
+          "snippet": "TOPLAM 2026;400000"
+        }
+      ]
+    },
+    "rolling-mill/b-04-uretim-2026.csv": {
+      "installation": "B",
+      "adversarial": false,
+      "fields": [
+        {
+          "key": "production_t",
+          "value": 300000,
+          "page": 1,
+          "snippet": "TOPLAM 2026;300000"
+        }
+      ]
+    }
+  },
+  "outcome": {
+    "meltShop": {
+      "totalT": 44178.079999999994,
+      "ownIntensity": 0.11044519999999998,
+      "lines": [
+        {
+          "stream": "natural gas",
+          "activity": 324000,
+          "unit": "GJ",
+          "factor": 0.0561,
+          "tCO2": 18176.399999999998
+        },
+        {
+          "stream": "electrodes",
+          "activity": 1000,
+          "unit": "t",
+          "factor": 3.0066666666666664,
+          "tCO2": 3006.6666666666665
+        },
+        {
+          "stream": "charge carbon",
+          "activity": 6400,
+          "unit": "t",
+          "factor": 3.043333333333333,
+          "tCO2": 19477.333333333332
+        },
+        {
+          "stream": "limestone",
+          "activity": 8000,
+          "unit": "t",
+          "factor": 0.43971,
+          "tCO2": 3517.68
+        }
+      ]
+    },
+    "rollingMill": {
+      "totalT": 20196,
+      "ownIntensity": 0.06732,
+      "lines": [
+        {
+          "stream": "natural gas",
+          "activity": 360000,
+          "unit": "GJ",
+          "factor": 0.0561,
+          "tCO2": 20196
+        }
+      ]
+    },
+    "rebarSee": 0.182182,
+    "note": "Shipment-level SEE for 500 t rebar consuming 520 t billet equals the yearly ratio when the shipment keeps the 1.04 t/t yield."
+  }
+}

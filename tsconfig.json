@@ -7,7 +7,15 @@
     "noEmit": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "types": ["bun"]
+    "types": [
+      "bun"
+    ]
   },
-  "include": ["calc", "extract", "api", "contracts/script"]
+  "include": [
+    "calc",
+    "extract",
+    "api",
+    "demo",
+    "contracts/script"
+  ]
 }
