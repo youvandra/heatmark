@@ -23,11 +23,15 @@ Deployer 0.0.11033671. Accreditor 0x35a70Ae4472186EB2884eA16D8761FC9f6Ad8063 (im
 - `api/` (Bun + Hono + SQLite, `bun run api/src/server.ts`, port 8796, data in `./data`): installations, reports, document upload (content-addressed blobs), extract, confirm/correct fields, submit (canonical bundle → sha256 = reportHash), verifier reject (signed message + on-chain `isActive`), attested (decodes the tx and refuses a mismatch with the bundle).
 - `bun test`: 27 pass (calc, extract checks, API lifecycle with fakes). Live chain read smoke-tested.
 
+## Demo data (15 Oct)
+- Demo verifier 0xd2321c9236733B39D8994DDEbd2175896B8412dF is active on chain (`bun run contracts/script/add-verifier.ts`).
+- `bun run demo:docs` writes byte-reproducible synthetic documents for two fictitious installations (Örnek Çelikhane melt shop, Örnek Haddehane rolling mill) plus one adversarial scrap receipt carrying an injected instruction. Every page is marked synthetic; every expected snippet is re-checked through the verifier's text extraction.
+- Correct extraction should give: melt shop own 0.1104 t/t, rolling mill own 0.0673 t/t, rebar SEE 0.1822 t/t.
+
 ## Not done
 - Tables are the regulation **as first published**; merge the correcting IR (EU) 2026/1740 (retroactive to 1 Jan 2026) before quoting rows publicly.
 - HCS lifecycle topic (versioned envelopes: hashes, ids, masses only).
 - `web/` (plant / verifier / public passport) on top of the API.
-- First live extraction run (costs API credit — ask first) against synthetic plant documents, which don't exist yet.
-- Add the demo verifier on chain (accreditor key) — `isActive(verifier)` is false today.
+- First live extraction run (costs API credit — ask first) against `demo/documents/`; compare with `demo/documents/expected.json`.
 - Synthetic demo documents, video, write-up, deck PDF for the required upload.
 - Demand evidence: 5–10 replies from Turkish exporters / CBAM consultants.
