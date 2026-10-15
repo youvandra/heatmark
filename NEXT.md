@@ -17,9 +17,17 @@ Source verified on Sourcify (`exact_match`), so HashScan shows it. Addresses in 
 
 Deployer 0.0.11033671. Accreditor 0x35a70Ae4472186EB2884eA16D8761FC9f6Ad8063 (immutable). Role keys (accreditor, verifier, melt shop, rolling mill, importer) are in `.env` and unfunded; no verifier added yet.
 
+## Extract + API (15 Oct)
+- `extract/`: Claude (`claude-opus-5-5`, structured output via Zod, `fallbacks: "default"`) reads a PDF/CSV and returns fields with page + verbatim snippet. `verify.ts` checks each snippet is on its page and holds the value; units are converted and summed in code (`activity.ts`), never by the model. Prompt treats document text as data.
+- `calc/src/emissions.ts`: IPCC 2006 default factors, attributed direct emissions and own intensity.
+- `api/` (Bun + Hono + SQLite, `bun run api/src/server.ts`, port 8796, data in `./data`): installations, reports, document upload (content-addressed blobs), extract, confirm/correct fields, submit (canonical bundle → sha256 = reportHash), verifier reject (signed message + on-chain `isActive`), attested (decodes the tx and refuses a mismatch with the bundle).
+- `bun test`: 27 pass (calc, extract checks, API lifecycle with fakes). Live chain read smoke-tested.
+
 ## Not done
 - Tables are the regulation **as first published**; merge the correcting IR (EU) 2026/1740 (retroactive to 1 Jan 2026) before quoting rows publicly.
 - HCS lifecycle topic (versioned envelopes: hashes, ids, masses only).
-- `extract/` (AI draft, human confirm), `api/`, `web/` (plant / verifier / public passport).
+- `web/` (plant / verifier / public passport) on top of the API.
+- First live extraction run (costs API credit — ask first) against synthetic plant documents, which don't exist yet.
+- Add the demo verifier on chain (accreditor key) — `isActive(verifier)` is false today.
 - Synthetic demo documents, video, write-up, deck PDF for the required upload.
 - Demand evidence: 5–10 replies from Turkish exporters / CBAM consultants.
