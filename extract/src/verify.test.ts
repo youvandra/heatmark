@@ -8,6 +8,12 @@ describe("numbersIn", () => {
     expect(numbersIn("Total 1,234,567.8 kWh")).toContain(1234567.8);
     expect(numbersIn("Elektrot 12 ton")).toContain(12);
   });
+
+  test("CSV columns stay separate numbers", () => {
+    const ns = numbersIn("TOTAL 2026,400000");
+    expect(ns).toContain(400000);
+    expect(ns).toContain(2026);
+  });
 });
 
 describe("checkField", () => {

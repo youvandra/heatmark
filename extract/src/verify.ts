@@ -20,6 +20,12 @@ export function numbersIn(snippet: string): number[] {
     const dotDecimal = Number(t.replace(/,/g, ""));
     if (Number.isFinite(commaDecimal)) out.add(commaDecimal);
     if (Number.isFinite(dotDecimal)) out.add(dotDecimal);
+    // A comma or space can also separate columns ("TOTAL 2026,400000" in a
+    // CSV), so each separated piece counts as a number on its own too.
+    for (const piece of raw.split(/[,;\s]+/)) {
+      const n = Number(piece);
+      if (piece && Number.isFinite(n)) out.add(n);
+    }
   }
   return [...out];
 }
