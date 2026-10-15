@@ -1,13 +1,14 @@
 // Shared Hedera testnet setup for the scripts: .env, chain, clients, mirror.
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { createPublicClient, createWalletClient, defineChain, http, type Hex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 export const root = resolve(dirname(new URL(import.meta.url).pathname), "../..");
 
+const envFile = resolve(root, ".env");
 export const env: Record<string, string> = Object.fromEntries(
-  readFileSync(resolve(root, ".env"), "utf8")
+  (existsSync(envFile) ? readFileSync(envFile, "utf8") : "")
     .split("\n")
     .filter((l) => /^[A-Z_]+=/.test(l))
     .map((l) => [l.slice(0, l.indexOf("=")), l.slice(l.indexOf("=") + 1).trim()]),
