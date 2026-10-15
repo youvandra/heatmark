@@ -1,0 +1,9 @@
+{
+  "name": "heatmark",
+  "private": true,
+  "workspaces": ["calc"],
+  "scripts": {
+    "verify": "bun run calc/scripts/verify.ts",
+    "test": "bun test calc && cd contracts && forge test"
+  }
+}
