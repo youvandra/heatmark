@@ -25,16 +25,22 @@ Deployer 0.0.11033671. Accreditor 0x35a70Ae4472186EB2884eA16D8761FC9f6Ad8063 (im
 
 ## Demo data (15 Oct)
 - Demo verifier 0xd2321c9236733B39D8994DDEbd2175896B8412dF is active on chain (`bun run contracts/script/add-verifier.ts`).
-- `bun run demo:docs` writes byte-reproducible synthetic documents for two fictitious installations (Örnek Çelikhane melt shop, Örnek Haddehane rolling mill) plus one adversarial scrap receipt carrying an injected instruction. Every page is marked synthetic; every expected snippet is re-checked through the verifier's text extraction.
+- `bun run demo:docs` writes byte-reproducible synthetic documents for two fictitious installations (Aegean Melt Shop and Aegean Rolling Mill, İzmir; English documents) plus one adversarial scrap receipt carrying an injected instruction. Every page is marked synthetic; every expected snippet is re-checked through the verifier's text extraction.
 - Correct extraction should give: melt shop own 0.1104 t/t, rolling mill own 0.0673 t/t, rebar SEE 0.1822 t/t.
 
 ## Live extraction (15 Oct)
 - `bun run demo/run-extraction.ts` scored 11/11 documents exactly (`demo/results/`, model `deepseek-v4-flash` through the git-ignored local adapter in `extract/src/local/`; the committed path uses the Anthropic SDK). Every field passed the snippet check; the adversarial scrap receipt's injected "production 900000" was quoted in warnings and not followed.
 - The first run was 10/11: the model invented a `documentType` outside the enum, the schema check refused it. The local adapter now retries once with the validation error.
 
+## Web (15–16 Oct)
+- `web/` (Vite + React, CSS tokens in `src/styles.css`, brief in `docs/DESIGN.md`): landing `/`, app `/app` (Plant, Verifier, Passports), public passport `/p/:id`, `/docs`. Dev: API `bun --watch api/src/server.ts` (:8796) + `bun run --cwd web dev` (:5196, proxies `/api`).
+- Demo signing roles come from `web/.env.local` (`VITE_DEMO_KEYS`, git-ignored) and exist only in a dev build; a production build carries no keys (checked by grepping `dist`).
+- Writes simulate with `eth_call` first: Hashio's gas estimate drops revert data, so this is how a refusal shows its contract error name.
+- Full flow run through the UI on Hedera testnet, 15–16 Oct: attestation #0 (melt shop, 0.110 t/t, 400 kt) and #1 (rolling mill, 0.067 t/t, 300 kt); passport #0 billet 520 t → rolling mill; passport #1 rebar 500 t → importer, SEE 0.182, €90/t (€44,999) saved vs default. Re-using billet #0 is refused (`PrecursorOverdrawn`). Importer salt for #1 is `DEMO_PASSPORT1_SALT` in `.env`.
+- Local dev data lives in `./data` (git-ignored); it holds one extra installation registered by hand with the verifier key, from before the API refused that.
+
 ## Not done
 - Tables are the regulation **as first published**; merge the correcting IR (EU) 2026/1740 (retroactive to 1 Jan 2026) before quoting rows publicly.
 - HCS lifecycle topic (versioned envelopes: hashes, ids, masses only).
-- `web/` (plant / verifier / public passport) on top of the API.
 - Synthetic demo documents, video, write-up, deck PDF for the required upload.
 - Demand evidence: 5–10 replies from Turkish exporters / CBAM consultants.
