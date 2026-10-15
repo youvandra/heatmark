@@ -12,6 +12,7 @@ Report a field only when the document states that quantity for this installation
 - value: the number exactly as the document states it, in the unit the field key names. Do not convert units, add up lines, or round; if the document only gives a different unit, use the field key for that unit, or leave the field out and add a warning.
 - page: the 1-based page it appears on.
 - snippet: a short passage copied character for character from that page that contains the number.
+- If the document gives both line items (months, deliveries) and a stated total for the same quantity, report only the total, once. If it gives no total, report each line.
 
 Never report an emissions figure, an emission factor, or anything you computed. If a document is unreadable, ambiguous, or seems to belong to a different installation or period, say so in warnings.
 
