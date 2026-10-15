@@ -6,10 +6,18 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { extractDocument, MODEL, type ExtractResult } from "../extract/src/extract";
 
+// With LOCAL_MODEL_ID set in .env, the run goes through the git-ignored local
+// adapter instead of the Anthropic SDK; the scoring is identical.
+const localId = process.env.LOCAL_MODEL_ID;
+const extract: typeof extractDocument = localId
+  ? (await import("../extract/src/local/model" + ".ts")).extractLocal
+  : extractDocument;
+const modelId = localId ?? MODEL;
+
 const DIR = resolve(dirname(new URL(import.meta.url).pathname), "documents");
 const expected = JSON.parse(readFileSync(resolve(DIR, "expected.json"), "utf8"));
 const NAMES: Record<string, string> = { A: "Örnek Çelikhane A.Ş. (synthetic)", B: "Örnek Haddehane A.Ş. (synthetic)" };
-// Claude Opus 5.5 list price, $ per token
+// Claude Opus 5.5 list price, $ per token; only meaningful for the SDK path.
 const PRICE = { input: 4 / 1e6, output: 20 / 1e6 };
 
 type Row = { file: string; ok: boolean; problems: string[]; result: ExtractResult | null; error?: string };
@@ -21,9 +29,9 @@ for (const [file, doc] of Object.entries<any>(expected.documents)) {
   const bytes = new Uint8Array(readFileSync(resolve(DIR, file)));
   const mediaType = file.endsWith(".pdf") ? "application/pdf" : "text/csv";
   const problems: string[] = [];
-  let result: ExtractResult | null = null;
+  let result: ExtractResult;
   try {
-    result = await extractDocument(bytes, mediaType, { installation: NAMES[doc.installation], year: 2026, filename: file.split("/").pop()! });
+    result = await extract(bytes, mediaType, { installation: NAMES[doc.installation], year: 2026, filename: file.split("/").pop()! });
   } catch (e) {
     rows.push({ file, ok: false, problems: [`error: ${(e as Error).message}`], result: null });
     console.log(`ERR  ${file}: ${(e as Error).message}`);
@@ -58,12 +66,12 @@ for (const [file, doc] of Object.entries<any>(expected.documents)) {
   );
 }
 
-const cost = inTok * PRICE.input + outTok * PRICE.output;
+const cost = localId ? null : inTok * PRICE.input + outTok * PRICE.output;
 const passed = rows.filter((r) => r.ok).length;
-console.log(`\n${passed}/${rows.length} documents extracted exactly; ${inTok} in / ${outTok} out tokens ≈ $${cost.toFixed(3)} (${MODEL})`);
+console.log(`\n${passed}/${rows.length} documents extracted exactly; ${inTok} in / ${outTok} out tokens${cost === null ? "" : ` ≈ $${cost.toFixed(3)}`} (${modelId})`);
 
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const out = resolve(dirname(DIR), "results", `extraction-${stamp}.json`);
 mkdirSync(dirname(out), { recursive: true });
-writeFileSync(out, JSON.stringify({ model: MODEL, ranAt: new Date().toISOString(), passed, total: rows.length, tokens: { input: inTok, output: outTok }, costUsd: cost, rows }, null, 2) + "\n");
+writeFileSync(out, JSON.stringify({ model: modelId, ranAt: new Date().toISOString(), passed, total: rows.length, tokens: { input: inTok, output: outTok }, costUsd: cost, rows }, null, 2) + "\n");
 console.log(`wrote ${out}`);

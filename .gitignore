@@ -6,3 +6,4 @@ contracts/broadcast
 CLAUDE.md
 .claude/
 data
+extract/src/local/
