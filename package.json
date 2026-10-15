@@ -5,7 +5,8 @@
     "calc",
     "extract",
     "api",
-    "demo"
+    "demo",
+    "web"
   ],
   "scripts": {
     "verify": "bun run calc/scripts/verify.ts",
