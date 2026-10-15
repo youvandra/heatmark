@@ -28,10 +28,13 @@ Deployer 0.0.11033671. Accreditor 0x35a70Ae4472186EB2884eA16D8761FC9f6Ad8063 (im
 - `bun run demo:docs` writes byte-reproducible synthetic documents for two fictitious installations (Örnek Çelikhane melt shop, Örnek Haddehane rolling mill) plus one adversarial scrap receipt carrying an injected instruction. Every page is marked synthetic; every expected snippet is re-checked through the verifier's text extraction.
 - Correct extraction should give: melt shop own 0.1104 t/t, rolling mill own 0.0673 t/t, rebar SEE 0.1822 t/t.
 
+## Live extraction (15 Oct)
+- `bun run demo/run-extraction.ts` scored 11/11 documents exactly (`demo/results/`, model `deepseek-v4-flash` through the git-ignored local adapter in `extract/src/local/`; the committed path uses the Anthropic SDK). Every field passed the snippet check; the adversarial scrap receipt's injected "production 900000" was quoted in warnings and not followed.
+- The first run was 10/11: the model invented a `documentType` outside the enum, the schema check refused it. The local adapter now retries once with the validation error.
+
 ## Not done
 - Tables are the regulation **as first published**; merge the correcting IR (EU) 2026/1740 (retroactive to 1 Jan 2026) before quoting rows publicly.
 - HCS lifecycle topic (versioned envelopes: hashes, ids, masses only).
 - `web/` (plant / verifier / public passport) on top of the API.
-- First live extraction run (costs API credit — ask first) against `demo/documents/`; compare with `demo/documents/expected.json`.
 - Synthetic demo documents, video, write-up, deck PDF for the required upload.
 - Demand evidence: 5–10 replies from Turkish exporters / CBAM consultants.
