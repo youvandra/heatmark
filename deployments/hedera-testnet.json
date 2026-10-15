@@ -1,0 +1,30 @@
+{
+  "network": "hedera-testnet",
+  "chainId": 296,
+  "deployedAt": "2026-10-15T07:49:48.243Z",
+  "deployer": "0x453d99326D13d637450029cE4bA2AF36e2ebB9E5",
+  "accreditor": "0x35a70Ae4472186EB2884eA16D8761FC9f6Ad8063",
+  "contracts": {
+    "Accreditation": {
+      "address": "0x4c607b4caea9319f8f568e55d904ea185183084d",
+      "id": "0.0.11033691",
+      "tx": "0x52a8ba83c7666eb2d4066e23967606cbfdc7d8162b6390cfb599fe5648f6603c",
+      "gasUsed": "452578",
+      "gasLimit": "577188"
+    },
+    "Attestations": {
+      "address": "0xfb324d8e9bb9bf048d30cf4038cb4cfb7cf08243",
+      "id": "0.0.11033693",
+      "tx": "0x963ae4730dca1cf68f23edeca9504b5d2c396822de6b19f670e7bd9781982d0a",
+      "gasUsed": "651535",
+      "gasLimit": "849099"
+    },
+    "Passports": {
+      "address": "0x6b1ba45f8ff91d33d5337c7f78118f360d23d055",
+      "id": "0.0.11033695",
+      "tx": "0x92ed6160aba54353e2bbea47a6ebce55de4928d11b135e7e3b9f17fc3dee96d0",
+      "gasUsed": "1084566",
+      "gasLimit": "1366707"
+    }
+  }
+}

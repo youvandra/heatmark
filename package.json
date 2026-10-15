@@ -1,9 +1,15 @@
 {
   "name": "heatmark",
   "private": true,
-  "workspaces": ["calc"],
+  "workspaces": [
+    "calc"
+  ],
   "scripts": {
     "verify": "bun run calc/scripts/verify.ts",
-    "test": "bun test calc && cd contracts && forge test"
+    "test": "bun test calc && cd contracts && forge test",
+    "deploy": "cd contracts && forge build && cd .. && bun run contracts/script/deploy.ts"
+  },
+  "devDependencies": {
+    "viem": "^2.57.7"
   }
 }
