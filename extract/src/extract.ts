@@ -6,7 +6,7 @@ import { checkField, type FieldCheck } from "./verify";
 
 export const MODEL = "claude-opus-5-5";
 
-const SYSTEM = `You read documents from a steel or cement plant and report the activity data a CBAM emissions report needs.
+export const SYSTEM = `You read documents from a steel or cement plant and report the activity data a CBAM emissions report needs.
 
 Report a field only when the document states that quantity for this installation. For each field:
 - value: the number exactly as the document states it, in the unit the field key names. Do not convert units, add up lines, or round; if the document only gives a different unit, use the field key for that unit, or leave the field out and add a warning.
@@ -46,14 +46,44 @@ export class ExtractionRefused extends Error {
   }
 }
 
+export type MediaType = "application/pdf" | "text/csv" | "text/plain";
+export interface DocContext {
+  installation: string;
+  year: number;
+  filename: string;
+}
+
+/** Text per page: what every cited snippet is checked against. */
+export const documentPages = (bytes: Uint8Array, mediaType: MediaType) =>
+  mediaType === "application/pdf" ? pdfPages(bytes) : Promise.resolve(textPages(bytes));
+
+export const contextLine = (c: DocContext) => `Installation: ${c.installation}. Reporting year: ${c.year}. File: ${c.filename}.`;
+
+/** Whatever model produced the extraction, its fields go through the same check. */
+export function finalize(
+  parsed: Extraction,
+  pages: string[],
+  meta: { model: string; servedBy: string; usage: ExtractResult["usage"] },
+): ExtractResult {
+  return {
+    documentType: parsed.documentType,
+    periodFrom: parsed.periodFrom,
+    periodTo: parsed.periodTo,
+    issuer: parsed.issuer,
+    fields: parsed.fields.map((f) => ({ ...f, check: checkField(pages, f) })),
+    warnings: parsed.warnings,
+    ...meta,
+  };
+}
+
 export async function extractDocument(
   bytes: Uint8Array,
-  mediaType: "application/pdf" | "text/csv" | "text/plain",
-  context: { installation: string; year: number; filename: string },
+  mediaType: MediaType,
+  context: DocContext,
   client = new Anthropic(),
 ): Promise<ExtractResult> {
   const isPdf = mediaType === "application/pdf";
-  const pages = isPdf ? await pdfPages(bytes) : textPages(bytes);
+  const pages = await documentPages(bytes, mediaType);
 
   const document: Anthropic.Beta.BetaContentBlockParam = isPdf
     ? {
@@ -74,18 +104,7 @@ export async function extractDocument(
     fallbacks: "default",
     output_config: { effort: "medium", format: betaZodOutputFormat(Extraction) },
     system: SYSTEM,
-    messages: [
-      {
-        role: "user",
-        content: [
-          document,
-          {
-            type: "text",
-            text: `Installation: ${context.installation}. Reporting year: ${context.year}. File: ${context.filename}.`,
-          },
-        ],
-      },
-    ],
+    messages: [{ role: "user", content: [document, { type: "text", text: contextLine(context) }] }],
   });
 
   if (response.stop_reason === "refusal") {
@@ -94,15 +113,9 @@ export async function extractDocument(
   const parsed = response.parsed_output;
   if (!parsed) throw new Error(`no structured output (stop_reason ${response.stop_reason})`);
 
-  return {
-    documentType: parsed.documentType,
-    periodFrom: parsed.periodFrom,
-    periodTo: parsed.periodTo,
-    issuer: parsed.issuer,
-    fields: parsed.fields.map((f) => ({ ...f, check: checkField(pages, f) })),
-    warnings: parsed.warnings,
+  return finalize(parsed, pages, {
     model: MODEL,
     servedBy: response.model,
     usage: { inputTokens: response.usage.input_tokens, outputTokens: response.usage.output_tokens },
-  };
+  });
 }
