@@ -7,6 +7,7 @@ import { FIELD_KEYS, type FieldKey } from "../../extract/src/schema";
 import type { ExtractResult } from "../../extract/src/extract";
 import { BundleError, buildBundle, sha256Hex } from "./bundle";
 import type { ReportStatus } from "./db";
+import { passportView, type ChainReader } from "./passports";
 
 type MediaType = "application/pdf" | "text/csv" | "text/plain";
 
@@ -30,6 +31,9 @@ export interface Deps {
   /** True when the address signed `message` and is an active verifier on chain. */
   verifierSigned: (address: `0x${string}`, message: string, signature: `0x${string}`) => Promise<boolean>;
   installationId: (country: string, registryId: string) => string;
+  chain: ChainReader;
+  /** Contract addresses and ids the web app needs; served as-is. */
+  config: Record<string, unknown>;
 }
 
 const MAX_UPLOAD = 20 * 1024 * 1024;
@@ -73,6 +77,22 @@ export function createApp(deps: Deps) {
   };
 
   app.get("/health", (c) => c.json({ ok: true }));
+  app.get("/config", (c) => c.json(deps.config));
+
+  // ---- passports (read from chain, named from the registry) -----------------
+
+  app.get("/passports", async (c) => {
+    const n = await deps.chain.count();
+    const ids = Array.from({ length: n }, (_, i) => n - 1 - i);
+    const views = await Promise.all(ids.map((id) => passportView(id, deps.chain, db, 4)));
+    return c.json(views);
+  });
+
+  app.get("/passports/:id", async (c) => {
+    const id = Number(c.req.param("id"));
+    if (!Number.isInteger(id) || id < 0 || id >= (await deps.chain.count())) fail(404, `no passport ${c.req.param("id")}`);
+    return c.json(await passportView(id, deps.chain, db));
+  });
 
   // ---- installations -------------------------------------------------------
 
@@ -89,6 +109,31 @@ export function createApp(deps: Deps) {
   });
 
   app.get("/installations", (c) => c.json(db.query("SELECT * FROM installations ORDER BY created_at").all()));
+
+  /** Attested reports of an installation, with how much of each cap is already passported. */
+  app.get("/installations/:id/attestations", async (c) => {
+    const inst = installation(c.req.param("id"));
+    const rows = db.query("SELECT id AS report_id, year, cn_code, attestation_id, attest_tx, bundle_json FROM reports WHERE installation_id = ? AND status = 'attested' ORDER BY year DESC").all(inst.id) as any[];
+    return c.json(
+      await Promise.all(
+        rows.map(async (r) => {
+          const a = await deps.chain.attestation(r.attestation_id);
+          const issued = await deps.chain.issued(r.attestation_id);
+          return {
+            attestationId: r.attestation_id,
+            reportId: r.report_id,
+            year: r.year,
+            cnCode: r.cn_code,
+            ownIntensity: a.ownIntensity / 1_000_000,
+            capKg: a.cap.toString(),
+            issuedKg: issued.toString(),
+            revoked: a.revoked,
+            tx: r.attest_tx,
+          };
+        }),
+      ),
+    );
+  });
 
   // ---- reports -------------------------------------------------------------
 

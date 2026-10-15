@@ -30,7 +30,35 @@ const fakeExtract: Deps["extract"] = async (): Promise<ExtractResult> => {
   };
 };
 
+// A two-passport chain on the fake ledger: billet (0) consumed by rebar (1).
+const A_ID = keccak256(toBytes("TR/MS-001"));
+const B_ID = keccak256(toBytes("TR/RM-001"));
+const ascii = (s: string, bytes: number) => `0x${Buffer.from(s.padEnd(bytes, "\0")).toString("hex")}` as `0x${string}`;
+let revokedA = false;
+const fakeChain: Deps["chain"] = {
+  count: async () => 2,
+  passport: async (id) =>
+    id === 0
+      ? { attestationId: 0n, cnCode: ascii("72071114", 8), mass: 520_000n, consumed: 520_000n, see: 110_400, depth: 1, declared: false, holder: B_ID, docHash: "0x00" }
+      : { attestationId: 1n, cnCode: ascii("72149910", 8), mass: 500_000n, consumed: 0n, see: 182_116, depth: 2, declared: false, holder: "0xabc", docHash: "0x00" },
+  status: async (id) => (revokedA ? (id === 0 ? 1 : 2) : 0),
+  precursors: async (id) => (id === 1 ? [{ passportId: 0n, mass: 520_000n }] : []),
+  attestation: async (id) => ({
+    installation: id === 0 ? A_ID : B_ID,
+    year: 2026,
+    route: ascii("E", 1),
+    ownIntensity: id === 0 ? 110_400 : 67_300,
+    cap: 400_000_000n,
+    reportHash: "0x01",
+    verifier: "0x02",
+    operator: OPERATOR,
+    revoked: id === 0 && revokedA,
+  }),
+  issued: async () => 1_000_000n,
+};
+
 beforeEach(() => {
+  revokedA = false;
   extractCalls = 0;
   nextEvent = {};
   signerOk = true;
@@ -41,6 +69,8 @@ beforeEach(() => {
     attestedEvent: async () => nextEvent as AttestedEvent,
     verifierSigned: async () => signerOk,
     installationId: (country, id) => keccak256(toBytes(`${country.toUpperCase()}/${id}`)),
+    chain: fakeChain,
+    config: { chainId: 296 },
   });
 });
 
@@ -162,5 +192,41 @@ describe("report lifecycle", () => {
     const res = await json("GET", `/blobs/${doc.sha256}`);
     expect(res.headers.get("content-type")).toBe("text/csv");
     expect(await res.text()).toBe(GAS_CSV);
+  });
+});
+
+describe("passports", () => {
+  async function registerBoth() {
+    await json("POST", "/installations", { name: "Melt shop", country: "TR", registryId: "MS-001", operator: OPERATOR, route: "E" });
+    await json("POST", "/installations", { name: "Rolling mill", country: "TR", registryId: "RM-001", operator: OPERATOR, route: "E" });
+  }
+
+  test("a passport shows its chain, names and the saving against the default", async () => {
+    await registerBoth();
+    const p = await (await json("GET", "/passports/1")).json();
+    expect(p.cnCode).toBe("72149910");
+    expect(p.see).toBeCloseTo(0.182116, 6);
+    expect(p.installation.name).toBe("Rolling mill");
+    expect(p.holder).toEqual({ kind: "importer" });
+    expect(p.precursors[0].installation.name).toBe("Melt shop");
+    expect(p.precursors[0].holder.name).toBe("Rolling mill");
+    expect(p.precursors[0].usedKg).toBe("520000");
+    // TR rebar default 2.541 (2026) on the BF/BOF benchmark vs 0.182 on scrap/EAF
+    const expectedCerts = 2.541 - 1.364 * 0.975 - (0.182116 - 0.066 * 0.975);
+    expect(p.savings.eurPerTonne).toBeCloseTo(expectedCerts * 82.32, 6);
+    expect(p.savings.eurShipment).toBeCloseTo(expectedCerts * 82.32 * 500, 4);
+  });
+
+  test("a revoked ancestor shows downstream", async () => {
+    await registerBoth();
+    revokedA = true;
+    const p = await (await json("GET", "/passports/1")).json();
+    expect(p.status).toBe("ancestor_revoked");
+    expect(p.precursors[0].status).toBe("revoked");
+  });
+
+  test("unknown passport is 404", async () => {
+    expect((await json("GET", "/passports/9")).status).toBe(404);
+    expect((await json("GET", "/passports/x")).status).toBe(404);
   });
 });

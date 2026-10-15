@@ -63,3 +63,21 @@ export async function readContract<T>(contract: keyof typeof abi, functionName: 
     args,
   })) as T;
 }
+
+import type { ChainReader } from "./passports";
+
+export const chainReader: ChainReader = {
+  passport: (id) => readContract("Passports", "get", [BigInt(id)]),
+  status: async (id) => Number(await readContract<number>("Passports", "status", [BigInt(id)])),
+  precursors: (id) => readContract("Passports", "precursorsOf", [BigInt(id)]),
+  attestation: (id) => readContract("Attestations", "get", [BigInt(id)]),
+  issued: (id) => readContract("Passports", "issued", [BigInt(id)]),
+  count: async () => Number(await readContract<bigint>("Passports", "count")),
+};
+
+export const publicConfig = {
+  chainId: 296,
+  rpcUrl: hederaTestnet.rpcUrls.default.http[0],
+  explorer: "https://hashscan.io/testnet",
+  contracts: deployment.contracts,
+};
